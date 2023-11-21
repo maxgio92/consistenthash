@@ -16,6 +16,14 @@ type Ring struct {
 	sync.RWMutex
 }
 
+type Nodes []*Node
+
+// Node is a single entity in a ring.
+type Node struct {
+	Id     string
+	HashId uint32
+}
+
 func NewRing() *Ring {
 	return &Ring{Nodes: Nodes{}}
 }
@@ -65,16 +73,6 @@ func (r *Ring) search(id string) int {
 	return sort.Search(r.Nodes.Len(), searchFn)
 }
 
-//----------------------------------------------------------
-// Node
-//----------------------------------------------------------
-
-// Node is a single entity in a ring.
-type Node struct {
-	Id     string
-	HashId uint32
-}
-
 func NewNode(id string) *Node {
 	return &Node{
 		Id:     id,
@@ -82,16 +80,10 @@ func NewNode(id string) *Node {
 	}
 }
 
-type Nodes []*Node
-
 // Nodes implement sort.Interface.
 func (n Nodes) Len() int           { return len(n) }
 func (n Nodes) Less(i, j int) bool { return n[i].HashId < n[j].HashId }
 func (n Nodes) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
-
-//----------------------------------------------------------
-// Helpers
-//----------------------------------------------------------
 
 func checksum(key string) uint32 {
 	return crc32.ChecksumIEEE([]byte(key))

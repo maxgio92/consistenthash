@@ -59,7 +59,7 @@ func (r *Ring) Get(key string) string {
 // It's implemented with sort.Search binary search.
 func (r *Ring) search(id string) int {
 	searchFn := func(i int) bool {
-		return r.Nodes[i].HashId >= hashId(id)
+		return r.Nodes[i].HashId >= checksum(id)
 	}
 
 	return sort.Search(r.Nodes.Len(), searchFn)
@@ -78,7 +78,7 @@ type Node struct {
 func NewNode(id string) *Node {
 	return &Node{
 		Id:     id,
-		HashId: hashId(id),
+		HashId: checksum(id),
 	}
 }
 
@@ -93,6 +93,6 @@ func (n Nodes) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
 // Helpers
 //----------------------------------------------------------
 
-func hashId(key string) uint32 {
+func checksum(key string) uint32 {
 	return crc32.ChecksumIEEE([]byte(key))
 }
